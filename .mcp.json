@@ -12,18 +12,6 @@
         "ODOO_MCP_ENABLE_WRITES": "${ODOO_PROD_ENABLE_WRITES}"
       }
     },
-    "odoo-staging": {
-      "command": "odoo-mcp",
-      "args": [],
-      "env": {
-        "ODOO_URL": "${ODOO_STAGING_URL}",
-        "ODOO_DB": "${ODOO_STAGING_DB}",
-        "ODOO_USERNAME": "${ODOO_STAGING_USERNAME}",
-        "ODOO_PASSWORD": "${ODOO_STAGING_API_KEY}",
-        "ODOO_TRANSPORT": "${ODOO_STAGING_TRANSPORT}",
-        "ODOO_MCP_ENABLE_WRITES": "1"
-      }
-    },
     "odoo-dev": {
       "command": "odoo-mcp",
       "args": [],

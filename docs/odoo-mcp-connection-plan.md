@@ -1,16 +1,17 @@
-# Odoo MCP Connection Plan — master / staging / development
+# Odoo MCP Connection Plan — master + development
 
 Goal: let an AI client (Claude Code) **read everything** in our Odoo.SH databases and
-**write only what we explicitly confirm**, across the production (`master`), `staging`,
-and `development` branches — without forcing our external GitHub admin (the supplier)
-to merge anything into the Odoo.SH repo.
+**write only what we explicitly confirm**, across the production (`master`) branch and
+the `development` branch — without forcing our external GitHub admin (the supplier)
+to merge anything into the Odoo.SH repo. (No dedicated staging branch today; add one
+the same way if that changes.)
 
 ## Decision
 
 | Item | Choice |
 |---|---|
 | Connector | **[tuanle96/mcp-odoo](https://github.com/tuanle96/mcp-odoo)** — external MCP process, MIT, Odoo 16-19, zero Odoo-side module, built-in write-gate |
-| Topology | One MCP server entry per Odoo.SH branch (`odoo-prod`, `odoo-staging`, `odoo-dev`) — each branch is a separate DB/URL |
+| Topology | One MCP server entry per Odoo.SH branch (`odoo-prod`, `odoo-dev`) — each branch is a separate DB/URL; add `odoo-staging` later if a staging branch is created |
 | Production write policy | Writes **enabled** but every write requires explicit confirmation in Claude; the Odoo `mcp-bot` user is restricted to an agreed model list |
 | Staging/dev write policy | Writes enabled; Claude still confirms each write |
 | Audit/native option | `muk_mcp` (native LGPL-3 addon, MCP-badged chatter) kept as a possible later phase if the supplier will merge & maintain a module |
@@ -29,10 +30,10 @@ to merge anything into the Odoo.SH repo.
 
 ```
 Claude Code (developer machine)            Odoo 19, transport: xmlrpc
-  ├─ mcp server "odoo-prod"     → https://www.acme-racing.com                       (db acme-racing)                  writes: confirm-each
-  ├─ mcp server "odoo-staging"  → (fill in if a dedicated staging branch exists; otherwise drop this entry)            writes: confirm-each
-  └─ mcp server "odoo-dev"      → https://acmeracing-19-0-31791711.dev.odoo.com     (db acmeracing-19-0-31791711)     writes: confirm-each
+  ├─ mcp server "odoo-prod"  → https://www.acme-racing.com                    (db acme-racing)               writes: confirm-each
+  └─ mcp server "odoo-dev"   → https://acmeracing-19-0-31791711.dev.odoo.com  (db acmeracing-19-0-31791711)  writes: confirm-each
 
+(No dedicated Odoo.SH staging branch — master + dev only.)
 Each connects with a dedicated Odoo technical user "mcp-bot" + per-branch API key.
 ```
 
@@ -52,10 +53,10 @@ Each connects with a dedicated Odoo technical user "mcp-bot" + per-branch API ke
 ## Manual actions runbook
 
 ### A. Gather facts
-- [ ] Production URL + DB name
-- [ ] Staging branch URL(s) + DB name(s)
-- [ ] Development branch URL(s) + DB name(s)
-- [ ] Confirm Odoo version (→ `xmlrpc` for 16-19, `json2` available on 19) and Odoo.SH plan tier
+- [x] Production: `https://www.acme-racing.com` — db `acme-racing` — Odoo 19
+- [x] Development: `https://acmeracing-19-0-31791711.dev.odoo.com` — db `acmeracing-19-0-31791711`
+- [x] Transport: `xmlrpc` (works on Odoo 19); no dedicated staging branch
+- [ ] Confirm Odoo.SH plan tier (only matters if we later switch to the JSON-2 transport)
 - [ ] Agree the **write-allowed model list** on production
 
 ### B. Create the `mcp-bot` user — on each branch (Odoo admin)
@@ -70,7 +71,7 @@ Each connects with a dedicated Odoo technical user "mcp-bot" + per-branch API ke
 - [ ] Load it before starting Claude Code: `set -a; source .env.mcp; set +a`
 - [ ] Restart Claude Code; read smoke test: `list_models`, `search_records` on `res.partner` against `odoo-dev`
 - [ ] Write smoke test on `odoo-dev` only — confirm the approval prompt fires before the write lands
-- [ ] Repeat read smoke tests against `odoo-staging` and `odoo-prod`
+- [ ] Repeat read smoke tests against `odoo-prod`
 
 ### D. (Optional) Claude Code dev plugins
 - [ ] Add `ahmed-lakosha/odoo-plugins` via the Claude Code plugin marketplace (confirm exact command from that repo's README); use `odoo-security`, `odoo-upgrade`, `odoo-test`, etc. on the dev branch.
@@ -81,7 +82,7 @@ Each connects with a dedicated Odoo technical user "mcp-bot" + per-branch API ke
 - [ ] Supplier confirms rate-limiting / WAF on the public `/mcp` endpoint
 - [ ] Install the module; generate per-user MCP keys from user preferences
 - [ ] Point/duplicate the relevant MCP server entry at the `/mcp` endpoint; re-test
-- [ ] Promote dev → staging → production once validated
+- [ ] Promote dev → production once validated
 
 ### F. Governance
 - [ ] Record who holds `mcp-bot` keys + a rotation schedule
