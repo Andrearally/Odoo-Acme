@@ -28,10 +28,10 @@ to merge anything into the Odoo.SH repo.
 ## Architecture
 
 ```
-Claude Code (developer machine)
-  ├─ mcp server "odoo-prod"     → https://acme.odoo.com                    writes: confirm-each
-  ├─ mcp server "odoo-staging"  → https://acme-staging-XXXX.dev.odoo.com   writes: confirm-each
-  └─ mcp server "odoo-dev"      → https://acme-dev-XXXX.dev.odoo.com       writes: confirm-each
+Claude Code (developer machine)            Odoo 19, transport: xmlrpc
+  ├─ mcp server "odoo-prod"     → https://www.acme-racing.com                       (db acme-racing)                  writes: confirm-each
+  ├─ mcp server "odoo-staging"  → (fill in if a dedicated staging branch exists; otherwise drop this entry)            writes: confirm-each
+  └─ mcp server "odoo-dev"      → https://acmeracing-19-0-31791711.dev.odoo.com     (db acmeracing-19-0-31791711)     writes: confirm-each
 
 Each connects with a dedicated Odoo technical user "mcp-bot" + per-branch API key.
 ```
