@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "odoo-prod": {
+      "command": "odoo-mcp",
+      "args": [],
+      "env": {
+        "ODOO_URL": "${ODOO_PROD_URL}",
+        "ODOO_DB": "${ODOO_PROD_DB}",
+        "ODOO_USERNAME": "${ODOO_PROD_USERNAME}",
+        "ODOO_PASSWORD": "${ODOO_PROD_API_KEY}",
+        "ODOO_TRANSPORT": "${ODOO_PROD_TRANSPORT}",
+        "ODOO_MCP_ENABLE_WRITES": "${ODOO_PROD_ENABLE_WRITES}"
+      }
+    },
+    "odoo-dev": {
+      "command": "odoo-mcp",
+      "args": [],
+      "env": {
+        "ODOO_URL": "${ODOO_DEV_URL}",
+        "ODOO_DB": "${ODOO_DEV_DB}",
+        "ODOO_USERNAME": "${ODOO_DEV_USERNAME}",
+        "ODOO_PASSWORD": "${ODOO_DEV_API_KEY}",
+        "ODOO_TRANSPORT": "${ODOO_DEV_TRANSPORT}",
+        "ODOO_MCP_ENABLE_WRITES": "1"
+      }
+    }
+  }
+}
